@@ -1,7 +1,7 @@
 {
   "scripts": {
     "start": "parcel serve ./src/index.html",
-    "build": "parcel build ./src/index.html --dist-dir docs --public-url ./"
+    "build": "parcel build ./src/index.html --no-cache --dist-dir docs --public-url ./docs && mv docs/index.html index.html && cp index.html 404.html"
   },
   "devDependencies": {
     "baseui": "9.84.2",
