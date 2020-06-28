@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "start": "parcel serve ./src/index.html",
+    "build": "parcel build ./src/index.html --dist-dir docs --public-url ./"
+  },
+  "devDependencies": {
+    "baseui": "9.84.2",
+    "parcel": "2.0.0-beta.1",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-router-dom": "5.2.0",
+    "styled-components": "5.1.1",
+    "styletron-engine-atomic": "1.4.6",
+    "styletron-react": "5.2.7"
+  }
+}
