@@ -19,11 +19,24 @@ Fader.Presenter = styled.div`
   transition: opacity 1s ease-in-out;
 
   opacity: ${textFrom("opacity")};
+
+  width: 100%;
+  height: 100%;
+`;
+
+function Clip() {}
+
+Clip.Presenter = styled.div`
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
 `;
 
 function Headshot(props: typeof Headshot.defaultProps) {
   const headshotRef = React.useRef();
   const [state, setState] = React.useState({ opacity: 0 });
+  const { opacity } = state;
 
   React.useEffect(() => {
     const { current } = headshotRef as any; // TODO: improve types
@@ -42,8 +55,14 @@ function Headshot(props: typeof Headshot.defaultProps) {
   }, [headshotRef.current, setState]);
 
   return (
-    <Fader.Presenter {...state}>
-      <Headshot.Presenter {...props} ref={headshotRef}></Headshot.Presenter>
+    <Fader.Presenter id="fader" opacity={opacity}>
+      <Clip.Presenter id="clip">
+        <Headshot.Presenter
+          id="headshot"
+          {...props}
+          ref={headshotRef}
+        ></Headshot.Presenter>
+      </Clip.Presenter>
     </Fader.Presenter>
   );
 }
@@ -55,7 +74,10 @@ Headshot.defaultProps = {} as {
 
 Headshot.Presenter = styled.img`
   position: absolute;
+  position: static;
+
   background-image: url(${textFrom("src")});
+  background-image: none;
 
   width: 100%;
   mask-image: linear-gradient(
@@ -70,20 +92,22 @@ Headshot.Presenter = styled.img`
 const Home = lazy(() => import("../pages/Home"));
 const Slides = lazy(() => import("../pages/Home"));
 const Tech = lazy(() => import("../pages/Home"));
-const Portfolio = lazy(() => import("../pages/Home"));
+const Profile = lazy(() => import("../pages/Home"));
 const Founder = lazy(() => import("../pages/Home"));
 const Leisure = lazy(() => import("../pages/Home"));
+const Musings = lazy(() => import("../pages/Home"));
 
 export function Pages() {
   return (
-    <Suspense fallback={"..."}>
+    <Suspense fallback={null}>
       <Switch>
         <Route path="/home" component={Home} />
         <Route path="/slides" component={Slides} />
         <Route path="/tech" component={Tech} />
-        <Route path="/portfolio" component={Portfolio} />
+        <Route path="/profile" component={Profile} />
         <Route path="/founder" component={Founder} />
         <Route path="/leisure" component={Leisure} />
+        <Route path="/musings" component={Musings} />
         <Route render={() => <Redirect to="/home" />} />
       </Switch>
     </Suspense>
@@ -104,15 +128,15 @@ export function Nav(props: typeof Nav.defaultProps) {
 
   const [activeItemId] =
     location.pathname.match(
-      /^\/(home|slides|tech|portfolio|founder|leisure)$/
+      /^\/(home|slides|tech|profile|founder|leisure|musings)$/
     ) || [];
 
   return (
     <>
-      <Nav.Presenter id="Nav" {...props}>
+      <Nav.Presenter id="nav" {...props}>
         <Headshot className="grayscaling" src={headshotURL}></Headshot>
-        <div className="flex">
-          <div className="overlay">
+        <div id="flex" className="flex">
+          <div id="overlay" className="overlay">
             <Navigation
               overrides={{
                 NavItem: {
@@ -120,9 +144,9 @@ export function Nav(props: typeof Nav.defaultProps) {
                     return {
                       ...$theme.typography.ParagraphLarge,
                       ...($active && {
-                        borderLeftColor: $theme.colors.rating200,
+                        borderLeftColor: $theme.colors.rating400,
                       }),
-                      color: $theme.colors.rating200,
+                      color: $theme.colors.rating400,
                       ":hover": {
                         color: $theme.colors.accent200,
                       },
@@ -137,9 +161,10 @@ export function Nav(props: typeof Nav.defaultProps) {
                   subNav: [
                     { title: "The Speaker", itemId: "/slides" },
                     { title: "The Technologist", itemId: "/tech" },
-                    { title: "The Professional", itemId: "/portfolio" },
+                    { title: "The Professional", itemId: "/profile" },
                     { title: "The Founder", itemId: "/founder" },
                     { title: "The Hobbyist", itemId: "/leisure" },
+                    // { title: "The Muser", itemId: "/musings" },
                   ],
                 },
               ]}
@@ -158,12 +183,22 @@ Nav.defaultProps = {};
 
 Nav.Presenter = styled.div`
   position: relative;
+  border-right: solid gray 1px;
+  border-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0),
+      rgba(0, 0, 0, 0),
+      rgba(0, 0, 0, 0),
+      gray
+    )
+    1 100%;
 
   width: ${SIZE.mobileS}px;
   height: 100%;
 
   .flex {
     position: absolute;
+
     top: 0;
     left: 0;
     bottom: 0;
