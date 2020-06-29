@@ -7,28 +7,37 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
+import { useStyletron } from "baseui";
+import { StyledLink } from "baseui/link";
+import { Paragraph2 } from "baseui/typography";
+import { FiGithub, FiTwitter } from "react-icons/fi";
 import { Navigation } from "baseui/side-navigation";
+import { Content } from "../views/Content";
 import { SIZE, textFrom } from "../utils/style";
 
 // TODO: shrink this image
 import headshotURL from "url:/../asset/image/headshot.jpg";
 
-function Fader() {}
+function Fader(props) {
+  return <Fader.Presenter {...props}></Fader.Presenter>;
+}
 
 Fader.Presenter = styled.div`
-  transition: opacity 1s ease-in-out;
+  transition: opacity 1.5s ease-in;
 
   opacity: ${textFrom("opacity")};
 
   width: 100%;
-  height: 100%;
+  max-height: 100%;
 `;
 
-function Clip() {}
+function Clip(props) {
+  return <Clip.Presenter {...props}></Clip.Presenter>;
+}
 
 Clip.Presenter = styled.div`
   width: 100%;
-  height: 100%;
+  max-height: 100%;
 
   overflow: hidden;
 `;
@@ -55,15 +64,15 @@ function Headshot(props: typeof Headshot.defaultProps) {
   }, [headshotRef.current, setState]);
 
   return (
-    <Fader.Presenter id="fader" opacity={opacity}>
-      <Clip.Presenter id="clip">
+    <Fader id="fader" opacity={opacity}>
+      <Clip id="clip">
         <Headshot.Presenter
           id="headshot"
           {...props}
           ref={headshotRef}
         ></Headshot.Presenter>
-      </Clip.Presenter>
-    </Fader.Presenter>
+      </Clip>
+    </Fader>
   );
 }
 
@@ -89,30 +98,130 @@ Headshot.Presenter = styled.img`
   );
 `;
 
-const Home = lazy(() => import("../pages/Home"));
-const Slides = lazy(() => import("../pages/Home"));
-const Tech = lazy(() => import("../pages/Home"));
-const Profile = lazy(() => import("../pages/Home"));
-const Founder = lazy(() => import("../pages/Home"));
-const Leisure = lazy(() => import("../pages/Home"));
-const Musings = lazy(() => import("../pages/Home"));
+function BottomBar() {
+  const [css, $theme] = useStyletron();
+
+  return (
+    <BottomBar.Presenter>
+      <span className="padded">
+        <StyledLink target="_blank" href="https://github.com/jfinity">
+          <FiGithub
+            size={$theme.sizing.scale800}
+            color={$theme.colors.accent300}
+          ></FiGithub>
+        </StyledLink>
+        <StyledLink target="_blank" href="https://twitter.com/jfinity_moore">
+          <FiTwitter
+            size={$theme.sizing.scale800}
+            color={$theme.colors.accent300}
+          ></FiTwitter>
+        </StyledLink>
+      </span>
+      <span className="padded">
+        <Paragraph2 color={$theme.colors.accent100} marginBottom={0}>
+          Copyright © 2020 Justin C. Moore
+        </Paragraph2>
+      </span>
+    </BottomBar.Presenter>
+  );
+}
+
+BottomBar.Presenter = styled.div`
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  .padded {
+    padding: 0 20px;
+
+    display: flex;
+
+    align-items: center;
+
+    svg {
+      margin-right: 16px;
+    }
+  }
+`;
+
+const page = ((mods) => {
+  const result = {} as {
+    [key in keyof typeof mods]: {
+      Header: any;
+      Body: any;
+    };
+  };
+
+  const keys = Object.keys(mods);
+
+  function Nothing() {
+    return null;
+  }
+
+  for (let index = 0; index < keys.length; index += 1) {
+    result[keys[index]] = {
+      Header: lazy(() =>
+        mods[keys[index]].then(({ Header }) => ({ default: Header || Nothing }))
+      ),
+      Body: lazy(() =>
+        mods[keys[index]].then(({ Body }) => ({ default: Body || Nothing }))
+      ),
+    };
+  }
+
+  return result;
+})({
+  Home: import("../pages/Home"),
+  Slides: import("../pages/Home"),
+  Tech: import("../pages/Home"),
+  Profile: import("../pages/Home"),
+  Founder: import("../pages/Home"),
+  Leisure: import("../pages/Home"),
+  Musings: import("../pages/Home"),
+});
 
 export function Pages() {
   return (
-    <Suspense fallback={null}>
-      <Switch>
-        <Route path="/home" component={Home} />
-        <Route path="/slides" component={Slides} />
-        <Route path="/tech" component={Tech} />
-        <Route path="/profile" component={Profile} />
-        <Route path="/founder" component={Founder} />
-        <Route path="/leisure" component={Leisure} />
-        <Route path="/musings" component={Musings} />
-        <Route render={() => <Redirect to="/home" />} />
-      </Switch>
-    </Suspense>
+    <Content>
+      {{
+        header: (
+          <Suspense fallback={null}>
+            <Switch>
+              <Route path="/home" component={page.Home.Header} />
+              <Route path="/slides" component={page.Slides.Header} />
+              <Route path="/tech" component={page.Tech.Header} />
+              <Route path="/profile" component={page.Profile.Header} />
+              <Route path="/founder" component={page.Founder.Header} />
+              <Route path="/leisure" component={page.Leisure.Header} />
+              <Route path="/musings" component={page.Musings.Header} />
+            </Switch>
+          </Suspense>
+        ),
+        body: (
+          <Suspense fallback={null}>
+            <Switch>
+              <Route path="/home" component={page.Home.Body} />
+              <Route path="/slides" component={page.Slides.Body} />
+              <Route path="/tech" component={page.Tech.Body} />
+              <Route path="/profile" component={page.Profile.Body} />
+              <Route path="/founder" component={page.Founder.Body} />
+              <Route path="/leisure" component={page.Leisure.Body} />
+              <Route path="/musings" component={page.Musings.Body} />
+              <Route render={() => <Redirect to="/home" />} />
+            </Switch>
+          </Suspense>
+        ),
+        footer: <BottomBar></BottomBar>
+      }}
+    </Content>
   );
 }
+
+const tabMatch = /^\/(home|slides|tech|profile|founder|leisure|musings)$/;
 
 export function Nav(props: typeof Nav.defaultProps) {
   const location = useLocation();
@@ -126,16 +235,14 @@ export function Nav(props: typeof Nav.defaultProps) {
     [history]
   );
 
-  const [activeItemId] =
-    location.pathname.match(
-      /^\/(home|slides|tech|profile|founder|leisure|musings)$/
-    ) || [];
+  const [activeItemId] = location.pathname.match(tabMatch) || [];
 
   return (
     <>
       <Nav.Presenter id="nav" {...props}>
         <Headshot className="grayscaling" src={headshotURL}></Headshot>
         <div id="flex" className="flex">
+          <div id="ceiling" className="ceiling" />
           <div id="overlay" className="overlay">
             <Navigation
               overrides={{
@@ -172,6 +279,9 @@ export function Nav(props: typeof Nav.defaultProps) {
               onChange={onChange}
             />
           </div>
+          <div id="counterweight" />
+          <div />
+          <div id="floor" className="floor" />
         </div>
       </Nav.Presenter>
       <Pages></Pages>
@@ -186,15 +296,22 @@ Nav.Presenter = styled.div`
   border-right: solid gray 1px;
   border-image: linear-gradient(
       to bottom,
+      gray,
+      gray,
       rgba(0, 0, 0, 0),
       rgba(0, 0, 0, 0),
       rgba(0, 0, 0, 0),
+      rgba(0, 0, 0, 0),
+      gray,
       gray
     )
     1 100%;
 
   width: ${SIZE.mobileS}px;
   height: 100%;
+  max-width: 25%;
+  min-width: 240px;
+  align-self: flex-start;
 
   .flex {
     position: absolute;
@@ -207,7 +324,17 @@ Nav.Presenter = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+  }
+
+  .ceiling {
+    width: 100%;
+    padding-top: 75%;
+  }
+
+  .floor {
+    width: 100%;
+    padding-top: 5%;
   }
 
   .overlay {

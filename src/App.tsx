@@ -27,7 +27,7 @@ export function App(props: typeof App.defaultProps) {
 App.defaultProps = {};
 
 App.Presenter = styled.div`
-  min-height: ${SIZE.mobileS}px;
+  min-height: ${2 * SIZE.mobileS}px;
 
   position: absolute;
 

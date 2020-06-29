@@ -3,16 +3,54 @@ import styled from "styled-components";
 import { Card, StyledBody } from "baseui/card";
 import { DisplayLarge } from "baseui/typography";
 import { Markdown } from "../components/Markdown";
+import { Content } from "../views/Content";
 
 const readme = ({ md }, state) => md/* md */ `
 # Hello world
 ${null && <button>label</button>}
 - ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
+- ok
 ${null && <input value="words" onChange={Object}></input>}
 `;
 
-export default Home;
-export function Home() {
+export function Body() {
   return null;
   // return (
   //   <DisplayLarge marginTop="scale500">
@@ -20,25 +58,22 @@ export function Home() {
   //   </DisplayLarge>
   // );
   return (
-    <Home.Presenter id="home">
-      <Card
-        overrides={{
-          Root: {
-            style: ({ $theme }) => {
-              return {
-                backgroundColor: "initial",
-                borderWidth: 0,
-              };
-            },
+    <Card
+      overrides={{
+        Root: {
+          style: ({ $theme }) => {
+            return {
+              backgroundColor: "initial",
+              borderTopStyle: "none",
+              borderLeftStyle: "none",
+              borderBottomStyle: "none",
+              borderRightStyle: "none",
+            };
           },
-        }}
-      >
-        <Markdown render={readme} />
-      </Card>
-    </Home.Presenter>
+        },
+      }}
+    >
+      <Markdown render={readme} />
+    </Card>
   );
 }
-
-Home.Presenter = styled.div`
-  flex: 1;
-`;
